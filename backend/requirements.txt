@@ -1,0 +1,12 @@
+fastapi==0.95.2
+uvicorn==0.23.2
+python-dotenv==1.0.0
+groq==0.20.0  
+gtts==2.5.4
+requests==2.31.0
+python-multipart==0.0.6
+
+
+#fastapi==0.95.2
+#uvicorn==0.23.2
+#speechrecognition==3.10.0

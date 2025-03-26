@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Chat App</title>
+</head>
+<body>
+    <h1>Record Audio and Send to Server</h1>
+    <button id="start">Start Recording</button>
+    <button id="stop" disabled>Stop Recording</button>
+    <p id="status"></p>
+    <audio id="response-audio" controls style="display: none;"></audio>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // Start recording when the "Start Recording" button is clicked
+        document.getElementById("start").addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                // Collect audio data chunks
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                // Handle the stop event
+                mediaRecorder.onstop = async () => {
+                    // Create a Blob from the recorded audio chunks
+                    const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+
+                    // Create FormData to send the audio file to the server
+                    const formData = new FormData();
+                    formData.append("audio_file", audioBlob, "recording.webm");
+
+                    // Send the audio file to the FastAPI backend
+                    fetch("http://backend:8000/voice/", {
+                        method: "POST",
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        document.getElementById("status").innerText = `ChatGPT Response: ${data.text}`;
+                        
+                        // Handle the audio response
+                        if (data.audio_url) {
+                            const audioUrl = `http://backend:8000${data.audio_url}`;
+                            const audioElement = document.getElementById("response-audio");
+                            audioElement.src = audioUrl;
+                            audioElement.style.display = "block";
+                            audioElement.play();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        document.getElementById("status").innerText = "Error sending audio to server.";
+                    });
+
+                    // Reset the audio chunks array
+                    audioChunks = [];
+                };
+
+                // Start recording
+                mediaRecorder.start();
+                document.getElementById("start").disabled = true;
+                document.getElementById("stop").disabled = false;
+                document.getElementById("status").innerText = "Recording started...";
+            } catch (error) {
+                console.error("Error accessing microphone:", error);
+                document.getElementById("status").innerText = "Microphone access denied.";
+            }
+        });
+
+        // Stop recording when the "Stop Recording" button is clicked
+        document.getElementById("stop").addEventListener("click", () => {
+            mediaRecorder.stop();
+            document.getElementById("start").disabled = false;
+            document.getElementById("stop").disabled = true;
+            document.getElementById("status").innerText = "Recording stopped. Sending audio to server...";
+        });
+    </script>
+</body>
+</html>

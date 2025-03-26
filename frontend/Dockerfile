@@ -1,0 +1,17 @@
+# Base image
+FROM nginx:alpine
+
+# Remove default Nginx website
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy static files from the local directory to the Nginx root directory
+COPY static/ /usr/share/nginx/html/
+
+# Copy custom Nginx configuration
+COPY static/nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 for HTTP traffic
+EXPOSE 80
+
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
