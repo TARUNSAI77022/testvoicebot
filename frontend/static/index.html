@@ -37,7 +37,7 @@
                     formData.append("audio_file", audioBlob, "recording.webm");
 
                     // Send the audio file to the FastAPI backend
-                    fetch("http://backend:8000/voice/", {
+                    fetch("http://localhost:8000/voice/", {
                         method: "POST",
                         body: formData,
                     })
@@ -48,7 +48,7 @@
                         
                         // Handle the audio response
                         if (data.audio_url) {
-                            const audioUrl = `http://backend:8000${data.audio_url}`;
+                            const audioUrl = `http://localhost:8000${data.audio_url}`;
                             const audioElement = document.getElementById("response-audio");
                             audioElement.src = audioUrl;
                             audioElement.style.display = "block";
