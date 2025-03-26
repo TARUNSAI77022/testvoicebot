@@ -5,13 +5,18 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Copy requirements file
-COPY requirements.txt .
+COPY backend/requirements.txt .
+
+
+# Copy .env file
+COPY backend/.env .
+
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY app/ .
+COPY backend/app/ ./app
 
 # Expose the port the app runs on
 EXPOSE 8000
