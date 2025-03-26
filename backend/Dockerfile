@@ -7,14 +7,14 @@ WORKDIR /app
 # Copy requirements file
 COPY requirements.txt .
 
+# Copy the .env file
+COPY .env .
+
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY app/ .
-
-# Copy the .env file
-COPY .env .
 
 # Expose the port the app runs on
 EXPOSE 8000
